@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Υπολογιστής Κύκλου Στροφής Αεροσκάφους</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f8;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .card {
+            background: #ffffff;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 380px;
+        }
+        h2 {
+            margin-top: 0;
+            color: #1a252f;
+            font-size: 1.2rem;
+            text-align: center;
+        }
+        .input-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+            color: #333;
+        }
+        .row {
+            display: flex;
+            gap: 10px;
+        }
+        input, select {
+            padding: 8px 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 0.95rem;
+        }
+        input[type="number"] {
+            flex: 1;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .results {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+        .result-item {
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #2c3e50;
+            font-size: 0.95rem;
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>Υπολογιστής Κύκλου Στροφής</h2>
+    
+    <div class="input-group">
+        <label for="speed">Ταχύτητα:</label>
+        <div class="row">
+            <input type="number" id="speed" placeholder="π.χ. 330" step="any">
+            <select id="unit">
+                <option value="knots">Knots</option>
+                <option value="kmh">km/h</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="input-group">
+        <label for="rate">Ρυθμός Στροφής (°/sec):</label>
+        <input type="number" id="rate" placeholder="π.χ. 42" step="any" style="width: 100%; box-sizing: border-box;">
+    </div>
+
+    <button onclick="calculate()">Υπολογισμός</button>
+
+    <div class="results">
+        <div class="result-item" id="radius">Ακτίνα (R): -</div>
+        <div class="result-item" id="diameter">Διάμετρος (D): -</div>
+    </div>
+</div>
+
+<script>
+    function calculate() {
+        const speed = parseFloat(document.getElementById('speed').value);
+        const rate = parseFloat(document.getElementById('rate').value);
+        const unit = document.getElementById('unit').value;
+
+        if (isNaN(speed) || isNaN(rate) || speed <= 0 || rate <= 0) {
+            alert('Παρακαλώ εισάγετε έγκυρους θετικούς αριθμούς.');
+            return;
+        }
+
+        // Μετατροπή ταχύτητας σε m/s
+        let v_ms = unit === 'knots' ? speed * 0.514444 : speed / 3.6;
+
+        // Μετατροπή ρυθμού στροφής σε rad/s
+        let omega = rate * (Math.PI / 180);
+
+        // Υπολογισμοί
+        let radius_m = v_ms / omega;
+        let diameter_m = 2 * radius_m;
+
+        let radius_nm = radius_m / 1852;
+        let diameter_nm = diameter_m / 1852;
+
+        // Ενημέρωση αποτελεσμάτων
+        document.getElementById('radius').innerText = 
+            `Ακτίνα (R): ${radius_m.toFixed(2)} m (${radius_nm.toFixed(3)} NM)`;
+        document.getElementById('diameter').innerText = 
+            `Διάμετρος (D): ${diameter_m.toFixed(2)} m (${diameter_nm.toFixed(3)} NM)`;
+    }
+</script>
+
+</body>
+</html>
