@@ -1,96 +1,35 @@
 import math
-import tkinter as tk
-from tkinter import ttk, messagebox
+import streamlit as st
 
+st.set_page_config(page_title="Υπολογιστής Κύκλου Στροφής", page_icon="🔄")
 
-def calculate():
-    try:
-        speed = float(entry_speed.get())
-        rate = float(entry_rate.get())
-        unit = combo_unit.get()
+st.title("🔄 Υπολογιστής Κύκλου Στροφής")
 
-        if rate <= 0 or speed <= 0:
-            messagebox.showerror(
-                "Σφάλμα", "Οι τιμές πρέπει να είναι θετικοί αριθμοί."
-            )
-            return
+# Εισαγωγή δεδομένων σε στήλες
+col1, col2 = st.columns(2)
 
-        # Μετατροπή ταχύτητας σε m/s
-        if unit == "Knots":
-            v_ms = speed * 0.514444
-        else:  # km/h
-            v_ms = speed / 3.6
+with col1:
+    speed = st.number_input("Ταχύτητα:", min_value=0.1, value=10.0, step=0.5)
+    unit = st.selectbox("Μονάδα Ταχύτητας:", ["Knots", "km/h"])
 
-        # Μετατροπή ρυθμού στροφής σε rad/s
-        omega = math.radians(rate)
+with col2:
+    rate = st.number_input("Ρυθμός Στροφής (°/sec):", min_value=0.1, value=3.0, step=0.1)
 
-        # Υπολογισμοί
-        radius_m = v_ms / omega
-        diameter_m = 2 * radius_m
+if st.button("🚀 Υπολογισμός", type="primary"):
+    # Μετατροπή ταχύτητας σε m/s
+    v_ms = speed * 0.514444 if unit == "Knots" else speed / 3.6
+    
+    # Μετατροπή ρυθμού στροφής σε rad/s
+    omega = math.radians(rate)
 
-        radius_nm = radius_m / 1852
-        diameter_nm = diameter_m / 1852
+    # Υπολογισμοί
+    radius_m = v_ms / omega
+    diameter_m = 2 * radius_m
 
-        # Ενημέρωση αποτελεσμάτων
-        lbl_radius.config(
-            text=f"Ακτίνα (R): {radius_m:.2f} m  ({radius_nm:.3f} NM)"
-        )
-        lbl_diameter.config(
-            text=f"Διάμετρος (D): {diameter_m:.2f} m  ({diameter_nm:.3f} NM)"
-        )
+    radius_nm = radius_m / 1852
+    diameter_nm = diameter_m / 1852
 
-    except ValueError:
-        messagebox.showerror(
-            "Σφάλμα Εισαγωγής", "Παρακαλώ εισάγετε έγκυρους αριθμούς."
-        )
-
-
-# Δημιουργία κεντρικού παραθύρου
-root = tk.Tk()
-root.title("Υπολογιστής Κύκλου Στροφής")
-root.geometry("400x300")
-root.resizable(False, False)
-
-# Διάταξη (Padding)
-frame = ttk.Frame(root, padding="20")
-frame.pack(fill=tk.BOTH, expand=True)
-
-# Εισαγωγή Ταχύτητας
-ttk.Label(frame, text="Ταχύτητα:").grid(
-    row=0, column=0, sticky=tk.W, pady=5
-)
-entry_speed = ttk.Entry(frame, width=12)
-entry_speed.grid(row=0, column=1, pady=5)
-
-combo_unit = ttk.Combobox(
-    frame, values=["Knots", "km/h"], width=8, state="readonly"
-)
-combo_unit.current(0)
-combo_unit.grid(row=0, column=2, padx=5, pady=5)
-
-# Εισαγωγή Ρυθμού Στροφής
-ttk.Label(frame, text="Ρυθμός Στροφής (°/sec):").grid(
-    row=1, column=0, sticky=tk.W, pady=5
-)
-entry_rate = ttk.Entry(frame, width=12)
-entry_rate.grid(row=1, column=1, pady=5)
-
-# Κουμπί Υπολογισμού
-btn_calc = ttk.Button(
-    frame, text="Υπολογισμός", command=calculate
-)
-btn_calc.grid(row=2, column=0, columnspan=3, pady=15)
-
-# Περιοχή Αποτελεσμάτων
-lbl_radius = ttk.Label(
-    frame, text="Ακτίνα (R): -", font=("Helvetica", 10, "bold")
-)
-lbl_radius.grid(row=3, column=0, columnspan=3, sticky=tk.W, pady=5)
-
-lbl_diameter = ttk.Label(
-    frame, text="Διάμετρος (D): -", font=("Helvetica", 10, "bold")
-)
-lbl_diameter.grid(row=4, column=0, columnspan=3, sticky=tk.W, pady=5)
-
-# Εκτέλεση εφαρμογής
-root.mainloop()
+    # Εμφάνιση αποτελεσμάτων
+    st.success("### Αποτελέσματα")
+    st.write(f"**Ακτίνα (R):** {radius_m:.2f} m (`{radius_nm:.3f} NM`)")
+    st.write(f"**Διάμετρος (D):** {diameter_m:.2f} m (`{diameter_nm:.3f} NM`)")
